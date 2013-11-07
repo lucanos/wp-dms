@@ -24,11 +24,19 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once(plugin_dir_path(__FILE__) . 'dms.class.php');
+require_once( plugin_dir_path( __FILE__ ) . 'dms.class.php' );
 
-add_action('init', array('DMS', 'run'), 1, 1);
-add_action('admin_init', array('DMS', 'adminInit'));
-add_action('admin_menu', array('DMS', 'addOptionsMenu'));
-add_action('admin_enqueue_scripts', array('DMS', 'registerScripts'));
-register_deactivation_hook(__FILE__, array('DMS', 'deactivate'));
+function debug_parse_query( $in ){
+  echo '<pre>';
+  var_dump( $in );
+  die( '</pre>' );
+}
+#add_filter( 'parse_request' , 'debug_parse_query' , 2 );
 
+
+add_filter( 'parse_request'         , array( 'DMS' , 'run'             ) , 1 );
+add_action( 'admin_init'            , array( 'DMS' , 'adminInit'       ) );
+add_action( 'admin_menu'            , array( 'DMS' , 'addOptionsMenu'  ) );
+add_action( 'admin_enqueue_scripts' , array( 'DMS' , 'registerScripts' ) );
+
+register_deactivation_hook( __FILE__ , array( 'DMS' , 'deactivate' ) );

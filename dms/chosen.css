@@ -48,7 +48,7 @@
   height: 23px;
   line-height: 24px;
   padding: 0 0 0 8px;
-  color: #444444;
+  color: #444;
   text-decoration: none;
 }
 .chzn-container-single .chzn-default {
@@ -194,7 +194,7 @@
   -moz-box-shadow   : 0 0 2px #ffffff inset, 0 1px 0 rgba(0,0,0,0.05);
   box-shadow        : 0 0 2px #ffffff inset, 0 1px 0 rgba(0,0,0,0.05);
   color: #333;
-  border: 1px solid #aaaaaa;
+  border: 1px solid #AAA;
   line-height: 13px;
   padding: 3px 20px 3px 5px;
   margin: 3px 0 3px 5px;

@@ -1,60 +1,55 @@
-<div id="screen-meta" class="metabox-prefs" style="display: block;">
-  <div id="screen-options-wrap" class="hidden" style="display: block;">
+<?php $dms_use = get_option( 'dms_use' , array() ); ?>
+<div id="screen-meta" class="metabox-prefs"<?php echo ( !count( $dms_use ) ? ' style="display:block"' : '' ); ?>>
+  <div id="screen-options-wrap" class="hidden"<?php echo ( !count( $dms_use ) ? ' style="display:block"' : '' ); ?>>
     <form id="adv-settings" action="options.php" method="post">
       <h5>Available Post Types</h5>
       <em>Select which Builtin- and Custom Post Types should be available for DMS.</em>
       <div class="metabox-prefs">
-        <label for="dms_use_page">
-          <input class="hide-postbox-tog" name="dms_use_page" type="checkbox" id="dms_use_page" <?php $opt = get_option('dms_use_page'); if ($opt === 'on') { echo "checked=\"checked\""; } ?>>
+        <label>
+          <input class="hide-postbox-tog" name="dms_use[]" type="checkbox" value="page"<?php echo ( in_array( 'page' , $dms_use ) ? ' checked="checked"' : '' ); ?> />
           Pages
         </label>
-        <label for="dms_use_post">
-          <input class="hide-postbox-tog" name="dms_use_post" type="checkbox" id="dms_use_post" <?php $opt = get_option('dms_use_post'); if ($opt === 'on') { echo "checked=\"checked\""; } ?>>
+        <label>
+          <input class="hide-postbox-tog" name="dms_use[]" type="checkbox" value="post"<?php echo ( in_array( 'post' , $dms_use ) ? ' checked="checked"' : '' ); ?> />
           Posts
         </label>
-        <label for="dms_use_categories">
-          <input class="hide-postbox-tog" name="dms_use_categories" type="checkbox" id="dms_use_categories" <?php $opt = get_option('dms_use_categories'); if ($opt === 'on') { echo "checked=\"checked\""; } ?>>
+        <label>
+          <input class="hide-postbox-tog" name="dms_use[]" type="checkbox" value="categories"<?php echo ( in_array( 'categories' , $dms_use ) ? ' checked="checked"' : '' ); ?> />
           Blog Categories
         </label>
-        <?php
-          $types = DMS::getCustomPostTypes();
+<?php
 
-          foreach ($types as $type)
-          {
-            echo "<label for=\"dms_use_{$type['name']}\">";
-            $value = get_option("dms_use_{$type['name']}");
-            if ($value === 'on')
-            {
-              echo "<input class=\"hide-postbox-tog\" name=\"dms_use_{$type['name']}\" type=\"checkbox\" id=\"dms_use_{$type['name']}\" checked=\"checked\">";
-            }
-            else
-            {
-              echo "<input class=\"hide-postbox-tog\" name=\"dms_use_{$type['name']}\" type=\"checkbox\" id=\"dms_use_{$type['name']}\">";
-            }
-            echo $type["label"];
-            echo "</label>";
-
-            if ($type['has_archive'])
-            {
-              echo "<label for=\"dms_use_{$type['name']}_archive\">";
-              $value = get_option("dms_use_{$type['name']}_archive");
-              if ($value === 'on')
-              {
-                echo "<input class=\"hide-postbox-tog\" name=\"dms_use_{$type['name']}_archive\" type=\"checkbox\" id=\"dms_use_{$type['name']}_archive\" checked=\"checked\">";
-              }
-              else
-              {
-              echo "<input class=\"hide-postbox-tog\" name=\"dms_use_{$type['name']}_archive\" type=\"checkbox\" id=\"dms_use_{$type['name']}_archive\">";
-                }
-                echo $type["label"] . " <strong>Archive</strong>";
-                echo "</label>";
-            }
-          }
-        ?>
+$types = DMS::getCustomPostTypes();
+if( count( $types ) ){
+?>
         <br class="clear">
+  <?php
+  foreach( $types as $type ){
+    $name  = $type['name'];
+    $label = $type['label'];
+?>
+        <label for="<?php echo $name; ?>">
+          <input class="hide-postbox-tog" name="dms_use[]" type="checkbox" value="<?php echo $name; ?>"<?php echo ( in_array( $name , $dms_use ) ? ' checked="checked"' : '' ); ?> />
+          <?php echo $label; ?>
+        </label>
 
-        <?php settings_fields('dms_config'); ?>
+<?php
+    if( $type['has_archive'] ){
+      $name  .= '_archive';
+      $label .= ' <strong>Archive</strong>';
+?>
+        <label for="<?php echo $name; ?>">
+          <input class="hide-postbox-tog" name="dms_use[]" type="checkbox" value="<?php echo $name; ?>"<?php echo ( in_array( $name , $dms_use ) ? ' checked="checked"' : '' ); ?> />
+          <?php echo $label; ?>
+        </label>
 
+<?php
+    }
+  }
+}
+?>
+        <br class="clear">
+        <?php settings_fields( 'dms_config' ); ?>
         <p class="submit">
           <input type="submit" class="button-primary" value="Save" />
         </p>
@@ -62,7 +57,6 @@
     </form>
   </div>
 </div>
-
 <div id="screen-meta-links">
   <div id="screen-options-link-wrap" class="hide-if-no-js screen-meta-toggle">
     <a href="#screen-options-wrap" id="show-settings-link" class="show-settings screen-meta-active">Configure DMS</a>
@@ -72,7 +66,17 @@
 <div class="wrap">
   <?php echo screen_icon(); ?>
   <h2>Domain Mapping System Configuration</h2>
-  <div class="updated">
+<?php
+if( !count( $dms_use ) ){
+?>
+  <div class="error">
+    <p><strong>Warning!</strong></p>
+    <p>You cannot edit your DMS Settings until you select one or more Post Types to map.</p>
+  </div>
+<?php
+}else{
+?>
+  <div class="updated" style="background:#BDE5F8;border-color:#00529B">
     <p><strong>Warning!</strong></p>
     <p>Only change these settings if you're <em>absolutely</em> sure what you're doing. Changing these settings might break the internet. Seriously.</p>
   </div>
@@ -87,67 +91,66 @@
             <label>Domains</label>
           </th>
         </tr>
-        <?php
-          $string = get_option('dms_map');
-          parse_str($string, $map);
+<?php
 
-          foreach ($map as $key => $value)
-          {
-        ?>
+  $options = DMS::getDMSOptions();
+  $map = array_combine( get_option( 'map_domain' , array() ) , get_option( 'map_target' , array() ) );
+
+  foreach( $map as $key => $value ){
+?>
         <tr>
           <th></th>
           <td>
-            <span class="pre-host">http://</span>
-            <input type="text" class="dms regular-text dms-collect-key" value="<?php echo str_replace("_", ".", $key); ?>" placeholder="www.example.com"/>
+            <span class="pre-host">http(s)://</span>
+            <input name="map_domain[]" type="text" class="dms regular-text dms-collect-key" value="<?php echo str_replace( '_' , '.' , $key ); ?>" placeholder="www.example.com"/>
             <span class="post-host">/</span>
-            <select class="dms page_id" name="page_id" data-placeholder="The choice is yours.">
+            <select name="map_target[]" class="dms page_id" data-placeholder="The choice is yours.">
               <option></option>
-              <?php
-                $options = DMS::getDMSOptions(); 
-                foreach ($options as $key => $optgroup)
-                {
-                  echo "<optgroup label=\"{$key}\">";
-                  foreach ($optgroup as $option)
-                  {
-                    if ((int) $option['id'] === (int) $value)
-                    {
-                      echo "<option selected=\"selected\" class=\"level-0\" value=\"{$option['id']}\">{$option['title']}</option>";
-                    }
-                    else
-                    {
-                      echo "<option class=\"level-0\" value=\"{$option['id']}\">{$option['title']}</option>";
-                    }
-                  }
-                  echo "</optgroup>";
-                }
-              ?>
+<?php
+    foreach( $options as $key => $optgroup ){
+?>
+              <optgroup label="<?php echo $key; ?>">
+<?php
+      foreach( $optgroup as $o ){
+?>
+                <option<?php echo ( $o['id']===$value ? ' selected="selected"' : '' ); ?> class="level-0" value="<?php echo $o['id']; ?>"><?php echo $o['title']; ?></option>
+<?php
+      }
+?>
+              </optgroup>
+<?php
+    }
+?>
             </select>
             <button class="dms-delete-row" title="Delete">&times;</button>
           </td>
         </tr>
-        <?php
-          }
-        ?>
+<?php
+  }
+?>
         <tr>
           <th></th>
           <td>
-            <span class="pre-host">http://</span>
-            <input type="text" class="dms regular-text dms-collect-key" placeholder="www.example.com" />
+            <span class="pre-host">http(s)://</span>
+            <input name="map_domain[]" type="text" class="dms regular-text dms-collect-key" placeholder="www.example.com" />
             <span class="post-host">/</span>
-            <select class="dms page_id" name="page_id" data-placeholder="The choice is yours.">
+            <select name="map_target[]" class="dms page_id" data-placeholder="The choice is yours.">
               <option></option>
-              <?php
-                $options = DMS::getDMSOptions();
-                foreach ($options as $key => $optgroup)
-                {
-                  echo "<optgroup label=\"{$key}\">";
-                  foreach ($optgroup as $option)
-                  {
-                    echo "<option class=\"level-0\" value=\"{$option['id']}\">{$option['title']}</option>";
-                  }
-                  echo "</optgroup>";
-                }
-              ?>
+<?php
+  foreach( $options as $key => $optgroup ){
+?>
+              <optgroup label="<?php echo $key; ?>">
+<?php
+    foreach( $optgroup as $o ){
+?>
+                <option class="level-0" value="<?php echo $o['id']; ?>"><?php echo $o['title']; ?></option>
+<?php
+    }
+?>
+              </optgroup>
+<?php
+  }
+?>
             </select>
             <button class="dms-delete-row" title="Delete">&times;</button>
           </td>
@@ -160,10 +163,12 @@
         </tr>
       </table>
     </fieldset>
-    <?php settings_fields('dms_storage'); ?>
-    <input type="hidden" id="dms_map" name="dms_map" value="<?php echo get_option('dms_map'); ?>" />
+    <?php settings_fields( 'dms_storage' ); ?>
     <p class="submit">
       <input type="submit" class="button-primary" value="Save" id="dms-submit-config" />
     </p>
   </form>
+<?php
+}
+?>
 </div>
