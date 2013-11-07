@@ -2,17 +2,17 @@
 /*
  * Plugin Name: Domain Mapping System
  * Plugin URI: http://projects.cheekyowl.com/wp-dms
- * Description: Maps certain Domains to certain WP pages (e.g. mywordpress.com -> default, myblog.com -> /blog, mypics.com -> /gallery) 
+ * Description: Maps certain Domains to certain WP pages (e.g. mywordpress.com -> default, myblog.com -> /blog, mypics.com -> /gallery)
  * Version: 1.3.2
  * Author: Robert Vogt
  * Author URI: http://www.cheekyowl.com
  * License: GPL3
  *
- * 
+ *
  * Copyright 2012 Robert Vogt (email: robert@cheekyowl.com)
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, version 2, as 
+ * it under the terms of the GNU General Public License, version 2, as
  * published by the Free Software Foundation.
 
  * This program is distributed in the hope that it will be useful,
